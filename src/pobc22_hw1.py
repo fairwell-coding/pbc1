@@ -9,8 +9,12 @@ import matplotlib.pyplot as plt
 
 # parameters
 
-u_rest = ...
-...
+u_rest = -65*mV
+u_reset = -75*mV
+u_th = -50*mV  # spike threshold
+R_m = 0.02 * Gohm
+C_m = 750 * pA
+tau_m = R_m * C_m
 
 t_sim = .6 * second
 dt = .1 * ms
@@ -34,17 +38,17 @@ def get_input_current(t_sim, dt, a_const=500*pA, a_ramp=1250*pA, a_sine=1000*pA)
     m = (t_const[0] <= t_values) & (t_values < t_const[1])
 
     # create const input current with amplitude a_const
-    I_values[m] = ...
+    I_values[m] = a_const
 
     m = (t_ramp[0] <= t_values) & (t_values < t_ramp[1])
 
     # create input current ramp with peak value a_const
-    I_values[m] = ...
+    I_values[m] = np.linspace(0, 1, sum(m)) * a_ramp
 
     m = (t_sine[0] <= t_values) & (t_values < t_sine[1])
 
     # create sine current (1 cycle) with peak value a_sine
-    I_values[m] = ...
+    I_values[m] = np.sin(np.linspace(0, 2 * np.pi, sum(m))) * a_sine
 
     return t_values, I_values
 
@@ -90,13 +94,15 @@ def get_analytical_response(t_values, I_values, u_rest, u_reset, u_th, tau_m, C_
 # setup neuron
 
 t_values, I_values = get_input_current(t_sim, dt)
-... = TimedArray(I_values, dt=dt)
+I_t = TimedArray(I_values, dt=dt)
 
-eqs = ...
-neuron = ...
+eqs = '''
+    du / dt = - ((u - u_rest) + R_m * I_t(t)) / tau_m : volt
+'''
+neuron = NeuronGroup(1, eqs, threshold='u>u_th', reset='u = u_reset')  # method='exact'
 
-state_mon = ...
-spike_mon = ...
+state_mon = StateMonitor(neuron, 'u', record=0)  # monitor 1st neuron
+spike_mon = SpikeMonitor(neuron)
 
 # run
 
@@ -104,21 +110,21 @@ brian2.run(t_sim)
 
 # extract results
 
-...
+# ...
 
 # plot the input current and a comparison of the analytical and
 # simulated membrane potentials
 #
 # don't forget to label your axes, insert a legend, etc.
 
-analytical_t, analytical_u = get_analytical_response(t_values, I_values, u_rest, u_reset, u_th, tau_m, C_m, dt)
+# analytical_t, analytical_u = get_analytical_response(t_values, I_values, u_rest, u_reset, u_th, tau_m, C_m, dt)
 
 plt.figure()
 
 plt.subplot(2, 1, 1)  # input current
-plt.plot(...)
+plt.plot(t_values, I_values)
 
-plt.subplot(2, 1, 2)  # membrane potentials
-plt.plot(...)
+# plt.subplot(2, 1, 2)  # membrane potentials
+# plt.plot(...)
 
 plt.show()  # avoid having multiple plt.show()s in your code
