@@ -13,7 +13,7 @@ u_rest = -65*mV
 u_reset = -75*mV
 u_th = -50*mV  # spike threshold
 R_m = 0.02 * Gohm
-C_m = 750 * pA
+C_m = 750 * pF
 tau_m = R_m * C_m
 
 t_sim = .6 * second
@@ -110,19 +110,25 @@ brian2.run(t_sim)
 
 # extract results
 
-# ...
+plt.figure()
+plt.subplot(2,1,1)
+plt.plot(state_mon.t/ms, state_mon.u[0])
 
 # plot the input current and a comparison of the analytical and
 # simulated membrane potentials
 #
 # don't forget to label your axes, insert a legend, etc.
 
-# analytical_t, analytical_u = get_analytical_response(t_values, I_values, u_rest, u_reset, u_th, tau_m, C_m, dt)
+analytical_t, analytical_u = get_analytical_response(t_values, I_values, u_rest, u_reset, u_th, tau_m, C_m, dt)
 
-plt.figure()
+plt.subplot(2,1,2)
+plt.plot(analytical_t, analytical_u)
 
-plt.subplot(2, 1, 1)  # input current
-plt.plot(t_values, I_values)
+
+# plt.figure()
+
+# plt.subplot(2, 1, 1)  # input current
+# plt.plot(t_values, I_values)
 
 # plt.subplot(2, 1, 2)  # membrane potentials
 # plt.plot(...)
