@@ -97,7 +97,7 @@ t_values, I_values = get_input_current(t_sim, dt)
 I_t = TimedArray(I_values, dt=dt)
 
 eqs = '''
-    du / dt = - ((u - u_rest) + R_m * I_t(t)) / tau_m : volt
+    du / dt = (-(u - u_rest) + R_m * I_t(t)) / tau_m : volt
 '''
 neuron = NeuronGroup(1, eqs, threshold='u>u_th', reset='u = u_reset', method='exact')
 
@@ -120,7 +120,7 @@ ax[0].set_xlabel('t / ms')
 ax[0].set_ylabel('I_ext(t) / pA')
 
 ax[1].plot(analytical_t * 1E3, analytical_u * 1E3, color="darkorange", label="analytical")
-# ax[1].plot(state_mon.t/ms, state_mon.u[0], color="mediumblue", label="Brian (simulated)")
+ax[1].plot(state_mon.t/ms, state_mon.u[0] * 1E3, color="mediumblue", label="Brian (simulated)")
 ax[1].set_title('Comparison of membrane potentials')
 ax[1].legend(loc='upper left')
 ax[1].set_xlabel('t / ms')
