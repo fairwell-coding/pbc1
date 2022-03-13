@@ -99,38 +99,37 @@ I_t = TimedArray(I_values, dt=dt)
 eqs = '''
     du / dt = - ((u - u_rest) + R_m * I_t(t)) / tau_m : volt
 '''
-neuron = NeuronGroup(1, eqs, threshold='u>u_th', reset='u = u_reset')  # method='exact'
+neuron = NeuronGroup(1, eqs, threshold='u>u_th', reset='u = u_reset', method='exact')
 
-state_mon = StateMonitor(neuron, 'u', record=0)  # monitor 1st neuron
-spike_mon = SpikeMonitor(neuron)
-
-# run
+state_mon = StateMonitor(neuron, 'u', record=0)  # monitor membrane potential of 1st neuron
+spike_mon = SpikeMonitor(neuron)  # record neuron spikes
 
 brian2.run(t_sim)
 
-# extract results
+analytical_t, analytical_u = get_analytical_response(t_values, I_values, u_rest, u_reset, u_th, tau_m, C_m, dt)  # calculate analytical membrane potential
 
-plt.figure()
-plt.subplot(2,1,1)
-plt.plot(state_mon.t/ms, state_mon.u[0])
+########################################################################################################################
 
-# plot the input current and a comparison of the analytical and
-# simulated membrane potentials
-#
-# don't forget to label your axes, insert a legend, etc.
+fig, ax = plt.subplots(2)
+fig.suptitle('Assignment 1 - LIF model', fontsize=16)
 
-analytical_t, analytical_u = get_analytical_response(t_values, I_values, u_rest, u_reset, u_th, tau_m, C_m, dt)
+ax[0].plot(t_values * 1E3, I_values * 1E12, color="forestgreen", label="input current")
+ax[0].set_title('Input current over time')
+ax[0].legend(loc='upper left')
+ax[0].set_xlabel('t / ms')
+ax[0].set_ylabel('I_ext(t) / pA')
 
-plt.subplot(2,1,2)
-plt.plot(analytical_t, analytical_u)
+ax[1].plot(analytical_t * 1E3, analytical_u * 1E3, color="darkorange", label="analytical")
+# ax[1].plot(state_mon.t/ms, state_mon.u[0], color="mediumblue", label="Brian (simulated)")
+ax[1].set_title('Comparison of membrane potentials')
+ax[1].legend(loc='upper left')
+ax[1].set_xlabel('t / ms')
+ax[1].set_ylabel('u(t) / mV')
 
+# plot neuron spike
+for t in spike_mon.t:
+    plt.axvline(t / ms, ls='--', c='darkred', lw=3, label="neuron spike")
+print('Spike times: %s' % spike_mon.t[:])
 
-# plt.figure()
-
-# plt.subplot(2, 1, 1)  # input current
-# plt.plot(t_values, I_values)
-
-# plt.subplot(2, 1, 2)  # membrane potentials
-# plt.plot(...)
-
-plt.show()  # avoid having multiple plt.show()s in your code
+plt.subplots_adjust(top=0.8, hspace=0.6)
+plt.show()
