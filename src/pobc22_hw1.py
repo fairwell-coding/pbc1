@@ -100,6 +100,7 @@ eqs = '''
     du / dt = (-(u - u_rest) + R_m * I_t(t)) / tau_m : volt
 '''
 neuron = NeuronGroup(1, eqs, threshold='u>u_th', reset='u = u_reset', method='exact')
+neuron.u = u_rest # set the initial neuron potential to the resting potential
 
 state_mon = StateMonitor(neuron, 'u', record=0)  # monitor membrane potential of 1st neuron
 spike_mon = SpikeMonitor(neuron)  # record neuron spikes
