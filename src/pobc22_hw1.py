@@ -119,17 +119,17 @@ ax[0].legend(loc='upper left')
 ax[0].set_xlabel('t / ms')
 ax[0].set_ylabel('I_ext(t) / pA')
 
-ax[1].plot(analytical_t * 1E3, analytical_u * 1E3, color="darkorange", label="analytical")
 ax[1].plot(state_mon.t/ms, state_mon.u[0] * 1E3, color="mediumblue", label="Brian (simulated)")
+ax[1].plot(analytical_t * 1E3, analytical_u * 1E3, linestyle='dashed', color="darkorange", label="analytical")
 ax[1].set_title('Comparison of membrane potentials')
-ax[1].legend(loc='upper left')
+ax[1].legend(loc='upper right')
 ax[1].set_xlabel('t / ms')
 ax[1].set_ylabel('u(t) / mV')
 
 # plot neuron spike
 for t in spike_mon.t:
     plt.axvline(t / ms, ls='--', c='darkred', lw=3, label="neuron spike")
-print('Spike times: %s' % spike_mon.t[:])
+print('Spike times: %s' % spike_mon.t)
 
 plt.subplots_adjust(top=0.8, hspace=0.6)
 plt.show()
